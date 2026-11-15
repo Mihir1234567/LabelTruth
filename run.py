@@ -25,9 +25,26 @@ def ensure_model_artifacts():
     else:
         print(f"[LabelTruth] Model artifacts verified at: {MODELS_DIR}")
 
+def find_available_port(host, preferred_port):
+    """Finds an available port starting from preferred_port."""
+    import socket
+    port = preferred_port
+    for _ in range(20):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                s.bind((host, port))
+                return port
+            except OSError:
+                port += 1
+    return preferred_port
+
 def start_server(host="127.0.0.1", port=8000, reload=True):
     """Starts the Uvicorn web server."""
     import uvicorn
+    # If not on cloud (PORT env var not set), ensure port is free or find nearby port
+    if not os.environ.get("PORT"):
+        port = find_available_port(host, port)
     print("\n" + "=" * 65)
     print("  LabelTruth: Explainable ML for Food Processing & Health Claims")
     print("=" * 65)

@@ -1,34 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LabelTruth — Explainable ML for Food Processing & Health-Claim Analysis</title>
+  <title>LabelTruth — The Truth About "Healthy" Foods | Food Processing & Health-Claim Auditor</title>
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Google Fonts Inter -->
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
-            nova1: '#10b981', // emerald
-            nova2: '#3b82f6', // blue
-            nova3: '#f59e0b', // amber
-            nova4: '#ef4444', // crimson
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            },
+            traffic: {
+              red: '#ef4444',
+              redBg: '#fef2f2',
+              redBorder: '#f87171',
+              amber: '#f59e0b',
+              amberBg: '#fffbeb',
+              amberBorder: '#fcd34d',
+              green: '#10b981',
+              greenBg: '#ecfdf5',
+              greenBorder: '#6ee7b7',
+              blue: '#3b82f6',
+              blueBg: '#eff6ff',
+              blueBorder: '#93c5fd'
+            }
           }
         }
       }
@@ -36,362 +59,504 @@
   </script>
 
   <style>
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    /* Clean custom styling */
+    body {
+      background-color: #f7faf8;
+      color: #1e293b;
+    }
 
-    .glow-nova1 { box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.4); }
-    .glow-nova2 { box-shadow: 0 0 25px -5px rgba(59, 130, 246, 0.4); }
-    .glow-nova3 { box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.4); }
-    .glow-nova4 { box-shadow: 0 0 25px -5px rgba(239, 68, 68, 0.4); }
-    .glow-alert { box-shadow: 0 0 30px -5px rgba(225, 29, 72, 0.5); }
+    /* Traffic Light Cards (Inspired by Reference Image 1) */
+    .traffic-pill-high {
+      background: #dc2626;
+      color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 14px 0 rgba(220, 38, 38, 0.25);
+    }
+    .traffic-pill-medium {
+      background: #f59e0b;
+      color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.25);
+    }
+    .traffic-pill-low {
+      background: #10b981;
+      color: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.25);
+    }
 
-    .glass-card {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    /* Folder-Tab Style Cards (Inspired by Reference Image 3) */
+    .folder-card {
+      position: relative;
+      border-radius: 1.25rem;
+      transition: all 0.2s ease-in-out;
+    }
+    .folder-tab {
+      position: absolute;
+      top: -12px;
+      left: 16px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 10px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    /* Authentic Nutrition Facts Label (Inspired by Reference Image 2) */
+    .nutrition-facts-box {
+      border: 2px solid #0f172a;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: '"Plus Jakarta Sans"', sans-serif;
+    }
+    .nutrition-facts-title {
+      font-weight: 900;
+      font-size: 1.5rem;
+      border-bottom: 8px solid #0f172a;
+      padding-bottom: 4px;
+      line-height: 1;
+    }
+    .nutrition-bar-thick {
+      border-bottom: 4px solid #0f172a;
+    }
+    .nutrition-bar-thin {
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .highlight-red-box {
+      border: 2px solid #ef4444;
+      background: #fff5f5;
+      padding: 6px 8px;
+      border-radius: 6px;
+    }
+
+    /* Soft card shadow */
+    .card-clean {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+      border-radius: 1.25rem;
+    }
+
+    .card-clean-hover:hover {
+      box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
     }
   </style>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+<body class="min-h-screen flex flex-col font-sans antialiased selection:bg-brand-600 selection:text-white">
 
-  <!-- TOP NAVIGATION HEADER -->
-  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <!-- TOP HEADER / BRAND BAR -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
       
-      <!-- Brand & Title -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-black text-xl">
-          LT
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-3.5">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-brand-700 via-brand-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-brand-700/20">
+          <i data-lucide="leaf" class="w-6 h-6"></i>
         </div>
         <div>
           <div class="flex items-center space-x-2">
-            <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-teal-200 to-cyan-400 bg-clip-text text-transparent">
-              LabelTruth
-            </span>
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              v1.0 • NLP & XAI
+            <span class="text-xl font-extrabold tracking-tight text-slate-900">LabelTruth</span>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-brand-100 text-brand-800 border border-brand-200">
+              Food Processing & Claims Auditor
             </span>
           </div>
-          <p class="text-[11px] text-slate-400 font-medium hidden sm:block">Explainable Food Processing & Health-Washing Auditor</p>
+          <p class="text-xs text-slate-500 font-medium">Explainable ML for Food Processing & "Health-Washing" Analysis</p>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
-      <nav class="flex items-center space-x-1 sm:space-x-2">
-        <button id="tab-inspector-btn" onclick="switchTab('inspector')" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center space-x-1.5 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-          <i data-lucide="scan-search" class="w-4 h-4"></i>
-          <span>Live Inspector</span>
+      <nav class="hidden md:flex items-center space-x-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+        <button id="nav-inspector" onclick="switchTab('inspector')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 bg-white text-brand-800 shadow-sm border border-slate-200/80">
+          <i data-lucide="scan-line" class="w-4 h-4 text-brand-600"></i>
+          <span>Food Inspector</span>
         </button>
 
-        <button id="tab-insights-btn" onclick="switchTab('insights')" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center space-x-1.5">
-          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+        <button id="nav-traffic" onclick="switchTab('traffic')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center space-x-2">
+          <i data-lucide="traffic-cone" class="w-4 h-4 text-amber-500"></i>
+          <span>Traffic Light Matrix</span>
+        </button>
+
+        <button id="nav-insights" onclick="switchTab('insights')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center space-x-2">
+          <i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-500"></i>
           <span>Research & Benchmarks</span>
         </button>
 
-        <button id="tab-batch-btn" onclick="switchTab('batch')" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center space-x-1.5">
-          <i data-lucide="layers" class="w-4 h-4"></i>
+        <button id="nav-batch" onclick="switchTab('batch')" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center space-x-2">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4 text-purple-500"></i>
           <span>Batch Scanner</span>
-        </button>
-
-        <button id="tab-methodology-btn" onclick="switchTab('methodology')" class="px-3 py-1.5 rounded-lg text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all flex items-center space-x-1.5">
-          <i data-lucide="book-open" class="w-4 h-4"></i>
-          <span class="hidden md:inline">Methodology</span>
         </button>
       </nav>
 
-      <!-- External Links & Status -->
-      <div class="hidden lg:flex items-center space-x-3">
-        <div class="flex items-center space-x-2 text-xs bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-slate-300 font-mono">FastAPI API Active</span>
+      <!-- Model Mode & API Docs Quick Link -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden lg:flex items-center space-x-2 text-xs bg-brand-50 text-brand-800 px-3 py-1.5 rounded-xl border border-brand-200">
+          <span class="w-2 h-2 rounded-full bg-brand-600 animate-pulse"></span>
+          <span class="font-semibold">FastAPI Engine Ready</span>
         </div>
-        <a href="/docs" target="_blank" class="text-xs text-slate-400 hover:text-emerald-400 transition-colors flex items-center space-x-1 font-mono">
+        <a href="/docs" target="_blank" class="text-xs font-semibold text-slate-600 hover:text-brand-700 bg-white border border-slate-200 px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1 shadow-sm">
           <span>API Docs</span>
-          <i data-lucide="external-link" class="w-3 h-3"></i>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
         </a>
       </div>
 
     </div>
   </header>
 
-  <!-- MAIN VIEWPORT CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-    <!-- ========================================== -->
-    <!-- TAB 1: LIVE FOOD INSPECTOR & XAI ENGINE    -->
-    <!-- ========================================== -->
-    <section id="tab-inspector" class="space-y-6">
-      
-      <!-- Hero Banner -->
-      <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800/60 to-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <span>Ingredient Processing & Health-Claim Auditor</span>
+    <!-- ======================================================== -->
+    <!-- HERO BANNER: INSPIRED DIRECTLY BY REFERENCE IMAGE 2       -->
+    <!-- "The Truth About 'Healthy' Foods"                         -->
+    <!-- ======================================================== -->
+    <section class="card-clean bg-gradient-to-br from-white via-brand-50/40 to-emerald-50/50 p-6 sm:p-8 border-brand-200/80 relative overflow-hidden">
+      <!-- Background subtle leaf accent -->
+      <div class="absolute -right-8 -bottom-8 w-64 h-64 bg-brand-200/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left: Truth About Healthy Foods Messaging -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-brand-100 text-brand-800 text-xs font-bold">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <span>Label Literacy & Public Health Science</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+            The Truth About <span class="text-brand-700">"Healthy"</span> Foods
           </h1>
-          <p class="text-sm text-slate-400 mt-1 max-w-3xl">
-            Input a commercial food product's name and raw ingredient text. Our calibrated TF-IDF NLP model predicts its international <strong class="text-slate-200">NOVA Processing Tier (1–4)</strong>, computes <strong class="text-slate-200">XAI token-level feature attributions</strong>, and audits front-of-package marketing claims against industrial ultra-processing (<strong class="text-rose-400">Health-Washing</strong>).
+
+          <p class="text-base text-slate-600 font-medium leading-relaxed max-w-2xl">
+            Not every product labeled <em>"Organic"</em>, <em>"Natural"</em>, or <em>"High Protein"</em> is a wholesome choice. Industrial formulations often disguise ultra-processing behind wellness claims—a phenomenon known as <strong class="text-rose-600 font-bold">Health-Washing</strong>.
+          </p>
+
+          <!-- 4 Pillars Checklist from Image 2 -->
+          <div class="pt-2">
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2.5">
+              Before buying, check:
+            </span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+              <div class="flex items-center space-x-2 bg-white/90 border border-slate-200 px-3 py-2 rounded-xl shadow-xs font-semibold text-slate-800">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">✓</span>
+                <span>NOVA Tier (1-4)</span>
+              </div>
+              <div class="flex items-center space-x-2 bg-white/90 border border-slate-200 px-3 py-2 rounded-xl shadow-xs font-semibold text-slate-800">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">✓</span>
+                <span>Cosmetic Additives</span>
+              </div>
+              <div class="flex items-center space-x-2 bg-white/90 border border-slate-200 px-3 py-2 rounded-xl shadow-xs font-semibold text-slate-800">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">✓</span>
+                <span>Marketing Claims</span>
+              </div>
+              <div class="flex items-center space-x-2 bg-white/90 border border-slate-200 px-3 py-2 rounded-xl shadow-xs font-semibold text-slate-800">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">✓</span>
+                <span>Explainable AI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Traffic Light Summary Card (Inspired by Image 1) -->
+        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Processing Traffic Light System</span>
+            <span class="text-[11px] font-semibold text-brand-700">FAO / Monteiro Guidelines</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-center text-xs">
+            <div class="p-2.5 rounded-xl bg-traffic-greenBg border border-traffic-greenBorder text-slate-800">
+              <span class="font-extrabold text-traffic-green text-sm block">NOVA 1</span>
+              <span class="text-[11px] text-slate-600 font-medium">Unprocessed / Minimal</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-traffic-blueBg border border-traffic-blueBorder text-slate-800">
+              <span class="font-extrabold text-traffic-blue text-sm block">NOVA 2</span>
+              <span class="text-[11px] text-slate-600 font-medium">Culinary Ingredients</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-traffic-amberBg border border-traffic-amberBorder text-slate-800">
+              <span class="font-extrabold text-traffic-amber text-sm block">NOVA 3</span>
+              <span class="text-[11px] text-slate-600 font-medium">Processed Foods</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-traffic-redBg border border-traffic-redBorder text-slate-800">
+              <span class="font-extrabold text-traffic-red text-sm block">NOVA 4</span>
+              <span class="text-[11px] text-slate-600 font-medium">Ultra-Processed (UPF)</span>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-slate-500 italic text-center pt-1">
+            "Reading the ingredients label is a healthy habit."
           </p>
         </div>
 
-        <!-- Model Mode Switcher -->
-        <div class="bg-slate-950/80 p-1.5 rounded-xl border border-slate-700/60 flex items-center space-x-1 shrink-0 self-start md:self-auto">
-          <button id="mode-default-btn" onclick="setModelMode('default')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-all">
-            Default LR (95.2% Acc)
-          </button>
-          <button id="mode-balanced-btn" onclick="setModelMode('balanced')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
-            Balanced LR (Minority Sensitive)
-          </button>
-        </div>
       </div>
+    </section>
 
-      <!-- Quick Preset Samples Bar -->
-      <div class="glass-card p-4 rounded-xl border border-slate-800">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
-            <span>Load Curated Benchmark Samples (1-Click Test):</span>
+    <!-- ======================================================== -->
+    <!-- SECTION 1: FOOD INSPECTOR & XAI AUDITOR                  -->
+    <!-- ======================================================== -->
+    <section id="tab-inspector" class="space-y-6">
+
+      <!-- Folder-Tab Style Curated Presets Bar (Inspired by Image 3) -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-slate-700">
+            <i data-lucide="bookmark-check" class="w-4 h-4 text-brand-600"></i>
+            <span>1-Click Test Products (From Notebook & Open Food Facts):</span>
           </div>
-          <span class="text-[11px] text-slate-500 hidden sm:inline">From Notebook Experiments & Qualitative Error Analysis</span>
+          <span class="text-[11px] text-slate-500 hidden sm:inline">Folder-Tab Quick Switcher</span>
         </div>
-        <div id="sample-buttons-container" class="flex flex-wrap gap-2">
+
+        <div id="presets-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2">
           <!-- Populated dynamically via JS -->
-          <div class="text-xs text-slate-500 animate-pulse">Loading benchmark samples...</div>
+          <div class="p-4 rounded-xl bg-white border border-slate-200 text-xs text-slate-400 animate-pulse text-center">Loading preset items...</div>
         </div>
       </div>
 
-      <!-- Grid Layout: Left Input / Right Output -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Main Input & Output Split Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-        <!-- Left Form Column (5 cols) -->
+        <!-- Form Column (5 Cols) -->
         <div class="lg:col-span-5 space-y-4">
-          <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+          <div class="card-clean p-6 space-y-4">
             
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h2 class="text-base font-bold text-white flex items-center gap-2">
-                <i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i>
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="edit-3" class="w-4 h-4 text-brand-600"></i>
                 <span>Product Formulation Input</span>
               </h2>
-              <button onclick="clearForm()" class="text-xs text-slate-400 hover:text-rose-400 transition-colors flex items-center gap-1">
-                <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
-                <span>Clear</span>
+              <button onclick="clearForm()" class="text-xs text-slate-400 hover:text-rose-600 font-semibold transition-colors flex items-center gap-1">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Reset</span>
               </button>
             </div>
 
-            <!-- Product Name -->
+            <!-- Product Packaging Name -->
             <div>
-              <label for="product-name-input" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Product Packaging Name (Contains Marketing Claims)
+              <label for="product-name-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Product Packaging Name (Marketing Claims)
               </label>
               <input
                 type="text"
                 id="product-name-input"
-                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-all font-medium"
                 placeholder="e.g. Healthy Choice Zero-Sugar Citrus Energy Blast"
                 value="Healthy Choice Zero-Sugar Sparkling Citrus Energy Blast"
               />
-              <p class="text-[11px] text-slate-500 mt-1">Marketing claims like 'Organic', 'Natural', 'Zero-Sugar', 'High-Protein' are audited here.</p>
+              <p class="text-[11px] text-slate-500 mt-1">Our engine checks for claims like 'Organic', 'Natural', 'Zero-Sugar', 'High-Protein', 'Low-Fat'.</p>
             </div>
 
             <!-- Ingredients Text Area -->
             <div>
-              <label for="ingredients-input" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Ingredients List (Comma-delimited or Raw Text)
+              <label for="ingredients-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                Ingredients List
               </label>
               <textarea
                 id="ingredients-input"
                 rows="6"
-                class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-100 placeholder-slate-500 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3.5 text-xs text-slate-800 placeholder-slate-400 font-mono focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-transparent transition-all leading-relaxed"
                 placeholder="e.g. carbonated water, corn syrup, artificial flavor, sodium benzoate, yellow 5..."
               >carbonated purified water, citric acid, aspartame, potassium benzoate, potassium citrate, acesulfame potassium, natural flavors, calcium disodium edta</textarea>
               <div class="flex items-center justify-between mt-1 text-[11px] text-slate-500">
-                <span>Evaluated via 2,000 TF-IDF N-Gram features</span>
-                <span id="char-count">162 characters</span>
+                <span>Vectorized with 2,000 TF-IDF N-grams</span>
+                <span id="char-count" class="font-mono">162 chars</span>
               </div>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Algorithm Mode Switcher -->
+            <div class="pt-1">
+              <span class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Classifier Paradigm:</span>
+              <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button id="btn-mode-default" onclick="setModelMode('default')" class="py-1.5 px-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs border border-slate-200/80 transition-all text-center">
+                  Default LR (95.2% Acc)
+                </button>
+                <button id="btn-mode-balanced" onclick="setModelMode('balanced')" class="py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all text-center">
+                  Balanced LR (Cost-Sensitive)
+                </button>
+              </div>
+            </div>
+
+            <!-- Audit Action Button -->
             <button
               id="analyze-btn"
               onclick="runAnalysis()"
-              class="w-full py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center space-x-2 active:scale-[0.98]"
+              class="w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-brand-700 hover:bg-brand-800 text-white shadow-md shadow-brand-700/20 hover:shadow-lg transition-all flex items-center justify-center space-x-2 active:scale-[0.98]"
             >
-              <i data-lucide="zap" class="w-4 h-4"></i>
-              <span>Analyze Food Processing & Claims</span>
+              <i data-lucide="search" class="w-4 h-4"></i>
+              <span>Audit Label & Detect Health-Washing</span>
             </button>
 
           </div>
-
-          <!-- Quick NOVA Legend Guide -->
-          <div class="glass-card p-4 rounded-xl border border-slate-800 text-xs space-y-2">
-            <span class="font-semibold text-slate-300 block mb-1">Standardized NOVA Classification Reference:</span>
-            <div class="grid grid-cols-2 gap-2">
-              <div class="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40">
-                <span class="font-bold text-emerald-400 block">NOVA 1: Unprocessed</span>
-                <span class="text-[11px] text-slate-400">Whole foods, fresh fruit, plain milk, oats, grains.</span>
-              </div>
-              <div class="p-2 rounded-lg bg-blue-950/40 border border-blue-800/40">
-                <span class="font-bold text-blue-400 block">NOVA 2: Culinary</span>
-                <span class="text-[11px] text-slate-400">Oils, butter, cane sugar, sea salt, maple syrup.</span>
-              </div>
-              <div class="p-2 rounded-lg bg-amber-950/40 border border-amber-800/40">
-                <span class="font-bold text-amber-400 block">NOVA 3: Processed</span>
-                <span class="text-[11px] text-slate-400">Canned vegetables, artisan bread, cured cheese.</span>
-              </div>
-              <div class="p-2 rounded-lg bg-rose-950/40 border border-rose-800/40">
-                <span class="font-bold text-rose-400 block">NOVA 4: Ultra-Processed</span>
-                <span class="text-[11px] text-slate-400">Soft drinks, packaged snacks, cosmetic additives.</span>
-              </div>
-            </div>
-          </div>
         </div>
 
-        <!-- Right Results Column (7 cols) -->
+        <!-- Output Column (7 Cols): Authentic Label & Traffic Light Result -->
         <div class="lg:col-span-7 space-y-4">
           
-          <!-- Empty State (hidden when result loaded) -->
-          <div id="results-empty" class="glass-card p-12 rounded-2xl border border-slate-800 text-center py-20 hidden">
-            <div class="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-500">
-              <i data-lucide="flask-conical" class="w-8 h-8"></i>
+          <!-- Empty State (hidden when results loaded) -->
+          <div id="results-empty" class="card-clean p-12 text-center py-24 hidden">
+            <div class="w-16 h-16 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="scan" class="w-8 h-8"></i>
             </div>
-            <h3 class="text-base font-semibold text-slate-300">Awaiting Product Formulation</h3>
-            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Select a benchmark sample above or enter custom ingredients to compute predictions and XAI explanations.</p>
+            <h3 class="text-base font-bold text-slate-800">Awaiting Product Ingredients</h3>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Select a folder-tab preset above or type an ingredients list to audit its processing level.</p>
           </div>
 
-          <!-- Active Prediction Card -->
+          <!-- Active Results Container -->
           <div id="results-card" class="space-y-4">
 
-            <!-- Health-Washing Alert Banner (Dynamic) -->
-            <div id="health-wash-alert" class="p-4 rounded-2xl border hidden transition-all">
+            <!-- 1. Health-Washing Alert Box (Inspired by the Red Callout in Image 2) -->
+            <div id="health-wash-banner" class="hidden rounded-2xl p-4 border transition-all">
               <!-- Dynamically injected -->
             </div>
 
-            <!-- Primary Classification Hero Card -->
-            <div id="nova-hero-card" class="glass-card p-6 rounded-2xl border transition-all">
-              <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-slate-800">
-                <div>
-                  <div class="flex items-center space-x-2">
-                    <span id="res-badge-pill" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                      NOVA 4 • ULTRA-PROCESSED
-                    </span>
-                    <span id="res-model-tag" class="text-[11px] font-mono text-slate-400 px-2 py-0.5 rounded bg-slate-800">
-                      Default LR
-                    </span>
-                  </div>
-                  <h3 id="res-nova-title" class="text-xl font-extrabold text-white mt-1.5">
-                    NOVA 4: Ultra-Processed Food Products (UPFs)
-                  </h3>
-                  <p id="res-nova-desc" class="text-xs text-slate-400 mt-1 max-w-xl">
-                    Industrial formulations made mostly or entirely from substances derived from foods and cosmetic additives.
-                  </p>
-                </div>
-
-                <!-- Giant Badge Circle -->
-                <div id="res-badge-circle" class="w-20 h-20 rounded-2xl flex flex-col items-center justify-center shrink-0 border">
-                  <span class="text-xs uppercase font-bold text-slate-400">NOVA</span>
-                  <span id="res-nova-num" class="text-3xl font-black">4</span>
-                </div>
+            <!-- 2. Four Traffic Light Badges Matrix (Inspired by Reference Image 1) -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              
+              <!-- Badge 1: Processing Tier -->
+              <div id="traffic-box-nova" class="p-4 rounded-2xl text-center text-white space-y-1 shadow-sm transition-all traffic-pill-high">
+                <span class="text-[10px] uppercase font-bold tracking-wider opacity-90 block">Processing Tier</span>
+                <span id="traffic-val-nova" class="text-2xl font-black block">NOVA 4</span>
+                <span id="traffic-sub-nova" class="text-[11px] opacity-90 font-medium block">Ultra-Processed</span>
               </div>
 
-              <!-- Dietary Guidance & Evidence -->
-              <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                  <span class="font-semibold text-slate-300 block mb-1 flex items-center gap-1.5">
-                    <i data-lucide="info" class="w-3.5 h-3.5 text-cyan-400"></i>
-                    <span>Public Health Guidance:</span>
-                  </span>
-                  <p id="res-guidance-text" class="text-slate-400 text-[11px] leading-relaxed">
-                    Epidemiologically linked to obesity, metabolic disorders, and CVD. Limit or avoid wherever possible.
-                  </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                  <span class="font-semibold text-slate-300 block mb-1 flex items-center gap-1.5">
-                    <i data-lucide="tag" class="w-3.5 h-3.5 text-amber-400"></i>
-                    <span>Packaging Claims Audited:</span>
-                  </span>
-                  <p id="res-claims-text" class="text-slate-400 text-[11px] leading-relaxed">
-                    Claims detected: None
-                  </p>
-                </div>
+              <!-- Badge 2: Confidence Level -->
+              <div class="p-4 rounded-2xl text-center bg-white border border-slate-200 text-slate-800 space-y-1 shadow-sm">
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">ML Confidence</span>
+                <span id="traffic-val-conf" class="text-2xl font-black text-slate-900 block font-mono">99.46%</span>
+                <span id="traffic-sub-conf" class="text-[11px] text-emerald-600 font-semibold block">Calibrated</span>
               </div>
 
-              <!-- Probability Confidence Distribution -->
-              <div class="mt-5 pt-4 border-t border-slate-800">
-                <div class="flex items-center justify-between text-xs mb-2">
-                  <span class="font-semibold text-slate-300">Calibrated Multi-Class Probability Distribution</span>
-                  <span id="res-confidence-tag" class="font-mono text-emerald-400 font-bold">99.46% Confidence</span>
-                </div>
-                
-                <!-- 4-bar progress row -->
-                <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                  <div class="space-y-1">
-                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div id="prob-bar-1" class="h-full bg-emerald-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <span class="text-[11px] text-slate-400 block font-mono">N1: <strong id="prob-val-1" class="text-slate-200">0%</strong></span>
-                  </div>
-                  <div class="space-y-1">
-                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div id="prob-bar-2" class="h-full bg-blue-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <span class="text-[11px] text-slate-400 block font-mono">N2: <strong id="prob-val-2" class="text-slate-200">0%</strong></span>
-                  </div>
-                  <div class="space-y-1">
-                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div id="prob-bar-3" class="h-full bg-amber-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <span class="text-[11px] text-slate-400 block font-mono">N3: <strong id="prob-val-3" class="text-slate-200">0%</strong></span>
-                  </div>
-                  <div class="space-y-1">
-                    <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div id="prob-bar-4" class="h-full bg-rose-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <span class="text-[11px] text-slate-400 block font-mono">N4: <strong id="prob-val-4" class="text-slate-200">0%</strong></span>
-                  </div>
-                </div>
+              <!-- Badge 3: Health-Washing Risk -->
+              <div id="traffic-box-risk" class="p-4 rounded-2xl text-center text-white space-y-1 shadow-sm transition-all traffic-pill-high">
+                <span class="text-[10px] uppercase font-bold tracking-wider opacity-90 block">Health-Washing</span>
+                <span id="traffic-val-risk" class="text-2xl font-black block">HIGH</span>
+                <span id="traffic-sub-risk" class="text-[11px] opacity-90 font-medium block">Claim Mismatch</span>
+              </div>
+
+              <!-- Badge 4: Claim Status -->
+              <div class="p-4 rounded-2xl text-center bg-white border border-slate-200 text-slate-800 space-y-1 shadow-sm">
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Claims Found</span>
+                <span id="traffic-val-claims" class="text-2xl font-black text-slate-900 block font-mono">2</span>
+                <span id="traffic-sub-claims" class="text-[11px] text-amber-600 font-semibold block">Zero-Sugar, Diet</span>
               </div>
 
             </div>
 
-            <!-- Explainable AI (XAI) Token Attribution Card -->
-            <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
-              <div class="flex items-center justify-between">
+            <!-- 3. Authentic "Label Truth Facts" Panel (Inspired by Image 2 Nutrition Facts) -->
+            <div class="nutrition-facts-box card-clean space-y-3">
+              <div class="flex items-center justify-between pb-1 border-b-8 border-slate-900">
                 <div>
-                  <h4 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="cpu" class="w-4 h-4 text-emerald-400"></i>
-                    <span>Explainable AI (XAI) Feature Attribution</span>
+                  <h3 class="nutrition-facts-title">LabelTruth Facts</h3>
+                  <span class="text-xs text-slate-500 font-semibold">Scientific Classification & Nutritional Audit</span>
+                </div>
+                <div class="text-right">
+                  <span id="label-product-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-900 text-white">
+                    Commercial Food Product
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-baseline py-1 nutrition-bar-thick text-sm font-bold">
+                <span>Product Name</span>
+                <span id="label-product-name" class="font-normal text-slate-700 truncate max-w-xs text-right">Healthy Choice Zero-Sugar Citrus Energy Blast</span>
+              </div>
+
+              <!-- NOVA Level & Description -->
+              <div class="py-2 nutrition-bar-thin space-y-1">
+                <div class="flex justify-between items-center text-sm">
+                  <span class="font-extrabold text-slate-900">NOVA Classification</span>
+                  <span id="label-nova-tier" class="font-extrabold text-traffic-red">NOVA 4: Ultra-Processed Food (UPF)</span>
+                </div>
+                <p id="label-nova-desc" class="text-xs text-slate-600 leading-relaxed">
+                  Industrial formulation manufactured with chemical substances not commonly used in culinary preparations.
+                </p>
+              </div>
+
+              <!-- Highlighted Deceptive Claims (Red border highlight box like in Image 2!) -->
+              <div id="label-claims-box" class="highlight-red-box text-xs space-y-1">
+                <div class="flex items-center justify-between font-bold text-rose-800">
+                  <span class="flex items-center gap-1.5">
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>
+                    <span>Packaging Marketing Claims Audit</span>
+                  </span>
+                  <span id="label-claims-status" class="uppercase text-[10px] px-1.5 py-0.2 bg-rose-200 text-rose-900 rounded font-bold">Health-Washing</span>
+                </div>
+                <p id="label-claims-text" class="text-rose-900 text-[11px] leading-relaxed">
+                  Includes claims: <em>"Zero-Sugar", "Healthy Choice"</em> while formulation contains industrial additives and artificial sweeteners.
+                </p>
+              </div>
+
+              <!-- Multi-class Probability Breakdown -->
+              <div class="pt-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-700 block mb-2">
+                  Calibrated Class Probability Distribution:
+                </span>
+                <div class="grid grid-cols-4 gap-2 text-center text-xs font-mono">
+                  <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">NOVA 1</span>
+                    <span id="prob-1" class="font-bold text-emerald-700">0.0%</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">NOVA 2</span>
+                    <span id="prob-2" class="font-bold text-blue-700">0.0%</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">NOVA 3</span>
+                    <span id="prob-3" class="font-bold text-amber-700">0.0%</span>
+                  </div>
+                  <div class="p-2 rounded-xl bg-slate-50 border border-slate-200">
+                    <span class="text-[10px] text-slate-500 block">NOVA 4</span>
+                    <span id="prob-4" class="font-bold text-rose-700">99.5%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Guidance Note -->
+              <div class="pt-2 text-[11px] text-slate-500 border-t border-slate-200 flex items-start gap-2">
+                <i data-lucide="info" class="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0"></i>
+                <p id="label-guidance-text">
+                  Epidemiological research associates high dietary proportion of NOVA 4 with elevated metabolic risk. Prefer whole, minimally processed alternatives.
+                </p>
+              </div>
+
+            </div>
+
+            <!-- 4. Explainable AI (XAI) Token Attribution Card -->
+            <div class="card-clean p-6 space-y-4">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="cpu" class="w-4 h-4 text-brand-600"></i>
+                    <span>Explainable AI (XAI) Ingredient Impact</span>
                   </h4>
-                  <p class="text-[11px] text-slate-400">
-                    Linear log-odds feature contributions $(\beta_j \cdot x_j)$ driving this specific formulation's classification.
+                  <p class="text-xs text-slate-500">
+                    Linear log-odds feature contributions (&beta; &times; x) showing why the model arrived at this decision.
                   </p>
                 </div>
-                <span class="text-[11px] font-mono text-slate-500 px-2 py-0.5 rounded bg-slate-800/80">
-                  Sparse TF-IDF N-grams
+                <span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  Sparse TF-IDF
                 </span>
               </div>
 
-              <!-- Highlighted Tokens Grid -->
-              <div id="xai-tokens-container" class="flex flex-wrap gap-2 pt-2">
+              <!-- Pill tags for tokens -->
+              <div id="xai-pills-container" class="flex flex-wrap gap-2 pt-1">
                 <!-- Dynamically populated -->
               </div>
 
-              <!-- Contributing Weights Table -->
-              <div class="overflow-x-auto rounded-xl border border-slate-800 mt-2">
+              <!-- Table -->
+              <div class="overflow-x-auto rounded-xl border border-slate-200 mt-2">
                 <table class="w-full text-left text-xs font-mono">
-                  <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200">
                     <tr>
-                      <th class="py-2 px-3">Ingredient N-Gram</th>
-                      <th class="py-2 px-3">Learned Model Weight (&beta;)</th>
-                      <th class="py-2 px-3">TF-IDF Value</th>
-                      <th class="py-2 px-3 text-right">Linear Impact</th>
+                      <th class="py-2.5 px-3">Ingredient N-Gram</th>
+                      <th class="py-2.5 px-3">Model Weight (&beta;)</th>
+                      <th class="py-2.5 px-3">TF-IDF Value</th>
+                      <th class="py-2.5 px-3 text-right">Class Impact</th>
                     </tr>
                   </thead>
-                  <tbody id="xai-table-body" class="divide-y divide-slate-800 text-slate-300">
+                  <tbody id="xai-table-body" class="divide-y divide-slate-100 text-slate-700">
                     <!-- Dynamically populated -->
                   </tbody>
                 </table>
@@ -406,194 +571,201 @@
 
     </section>
 
-    <!-- ========================================== -->
-    <!-- TAB 2: SCIENTIFIC RESEARCH & BENCHMARKS    -->
-    <!-- ========================================== -->
-    <section id="tab-insights" class="space-y-6 hidden">
+    <!-- ======================================================== -->
+    <!-- SECTION 2: TRAFFIC LIGHT MATRIX (INSPIRED BY IMAGE 1)   -->
+    <!-- ======================================================== -->
+    <section id="tab-traffic" class="space-y-6 hidden">
       
-      <!-- Section Header -->
-      <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800/60 to-slate-900 border border-slate-800">
-        <h2 class="text-2xl font-bold text-white tracking-tight">
-          Empirical Research Findings & Model Benchmarking
+      <!-- Header -->
+      <div class="card-clean p-6 sm:p-8 space-y-2">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">
+          <i data-lucide="traffic-cone" class="w-3.5 h-3.5"></i>
+          <span>Standardized Nutrition & Processing Guidelines</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
+          Nutrition Traffic Light & Processing Matrix
         </h2>
-        <p class="text-sm text-slate-400 mt-1 max-w-4xl">
-          Detailed scientific audit of the Open Food Facts 50,000-product cohort. Benchmarking supervised NLP classifiers, resolving severe minority class starvation, and testing the <strong class="text-slate-200">Health-Washing independence hypothesis</strong> via Pearson's Chi-Square Test.
+        <p class="text-sm text-slate-600 max-w-3xl">
+          Guidelines based on standardized 100g product measures and the international 4-tier NOVA classification system (Monteiro et al.).
         </p>
       </div>
 
-      <!-- Key Stat Counters -->
+      <!-- Traffic Light Table (Recreating Image 1 Layout with Clean Modern Styling) -->
+      <div class="card-clean p-6 space-y-6">
+        <h3 class="text-base font-extrabold text-slate-900">Guidelines Based on 100g of Food Product</h3>
+
+        <div class="overflow-x-auto">
+          <div class="min-w-[640px] space-y-4">
+            
+            <!-- HIGH ROW (RED) -->
+            <div class="grid grid-cols-5 gap-3 items-center">
+              <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-center">
+                <span class="text-base font-black text-rose-700 block">HIGH</span>
+                <span class="text-[10px] text-rose-600 font-semibold uppercase">Per 100g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-rose-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Sugars</span>
+                <span class="text-lg font-black block mt-0.5">Over 15g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-rose-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Fat</span>
+                <span class="text-lg font-black block mt-0.5">Over 20g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-rose-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Saturates</span>
+                <span class="text-lg font-black block mt-0.5">Over 5g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-rose-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Salt</span>
+                <span class="text-lg font-black block mt-0.5">Over 1.5g</span>
+              </div>
+            </div>
+
+            <!-- MEDIUM ROW (AMBER) -->
+            <div class="grid grid-cols-5 gap-3 items-center">
+              <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+                <span class="text-base font-black text-amber-700 block">MEDIUM</span>
+                <span class="text-[10px] text-amber-600 font-semibold uppercase">Per 100g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-amber-500 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Sugars</span>
+                <span class="text-lg font-black block mt-0.5">5g – 15g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-amber-500 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Fat</span>
+                <span class="text-lg font-black block mt-0.5">3g – 20g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-amber-500 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Saturates</span>
+                <span class="text-lg font-black block mt-0.5">1.5g – 5g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-amber-500 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Salt</span>
+                <span class="text-lg font-black block mt-0.5">0.3g – 1.5g</span>
+              </div>
+            </div>
+
+            <!-- LOW ROW (GREEN) -->
+            <div class="grid grid-cols-5 gap-3 items-center">
+              <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+                <span class="text-base font-black text-emerald-700 block">LOW</span>
+                <span class="text-[10px] text-emerald-600 font-semibold uppercase">Per 100g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-emerald-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Sugars</span>
+                <span class="text-lg font-black block mt-0.5">Below 5g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-emerald-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Fat</span>
+                <span class="text-lg font-black block mt-0.5">Below 3g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-emerald-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Saturates</span>
+                <span class="text-lg font-black block mt-0.5">Below 1.5g</span>
+              </div>
+              <div class="p-4 rounded-2xl bg-emerald-600 text-white text-center shadow-sm">
+                <span class="text-xs uppercase font-medium opacity-90 block">Salt</span>
+                <span class="text-lg font-black block mt-0.5">Below 0.3g</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- SECTION 3: RESEARCH & BENCHMARKS                         -->
+    <!-- ======================================================== -->
+    <section id="tab-insights" class="space-y-6 hidden">
+      
+      <div class="card-clean p-6 sm:p-8 space-y-2">
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
+          Scientific Research & Algorithmic Benchmarks
+        </h2>
+        <p class="text-sm text-slate-600 max-w-4xl">
+          Empirical evaluation on the global 50,000 Open Food Facts dataset. Testing the <strong class="text-slate-900">Health-Washing independence hypothesis</strong> via Pearson's Chi-Square Test and resolving the Accuracy Paradox.
+        </p>
+      </div>
+
+      <!-- Stats Grid -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="glass-card p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-medium block">Open Food Facts Cohort</span>
-          <span class="text-2xl font-black text-white font-mono mt-1 block">50,000</span>
-          <span class="text-[11px] text-emerald-400 flex items-center gap-1 mt-0.5">
-            <i data-lucide="check-circle" class="w-3 h-3"></i> Cleaned & Stratified
-          </span>
+        <div class="card-clean p-5">
+          <span class="text-xs text-slate-500 font-semibold block">Open Food Facts Cohort</span>
+          <span class="text-2xl font-black text-slate-900 font-mono mt-1 block">50,000</span>
+          <span class="text-[11px] text-emerald-600 font-medium">Cleaned & Stratified</span>
         </div>
-
-        <div class="glass-card p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-medium block">Logistic Regression Accuracy</span>
-          <span class="text-2xl font-black text-emerald-400 font-mono mt-1 block">95.19%</span>
-          <span class="text-[11px] text-slate-400">Held-out test set ($N=10,000$)</span>
+        <div class="card-clean p-5">
+          <span class="text-xs text-slate-500 font-semibold block">Model Test Accuracy</span>
+          <span class="text-2xl font-black text-brand-700 font-mono mt-1 block">95.19%</span>
+          <span class="text-[11px] text-slate-500">Held-out test set (N=10,000)</span>
         </div>
-
-        <div class="glass-card p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-medium block">Chi-Square Independence</span>
-          <span class="text-2xl font-black text-cyan-400 font-mono mt-1 block">&chi;&sup2; = 409.96</span>
-          <span class="text-[11px] text-rose-400 font-semibold font-mono">p = 1.54 &times; 10&supmin;&sup8;&sup8;</span>
+        <div class="card-clean p-5">
+          <span class="text-xs text-slate-500 font-semibold block">Chi-Square Independence</span>
+          <span class="text-2xl font-black text-blue-600 font-mono mt-1 block">&chi;&sup2; = 409.96</span>
+          <span class="text-[11px] text-rose-600 font-mono font-bold">p = 1.54 &times; 10&supmin;&sup8;&sup8;</span>
         </div>
-
-        <div class="glass-card p-4 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400 font-medium block">Health-Washing Rate</span>
-          <span class="text-2xl font-black text-rose-400 font-mono mt-1 block">53.67%</span>
-          <span class="text-[11px] text-slate-400">of health claims are UPFs</span>
+        <div class="card-clean p-5">
+          <span class="text-xs text-slate-500 font-semibold block">Commercial Health-Washing</span>
+          <span class="text-2xl font-black text-rose-600 font-mono mt-1 block">53.67%</span>
+          <span class="text-[11px] text-slate-500">of health claims are UPFs</span>
         </div>
       </div>
 
-      <!-- Charts Row: Distribution & Claims -->
+      <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- Chart 1: NOVA Distribution & Imbalance -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-400"></i>
-              <span>Open Food Facts NOVA Processing Distribution (N=50,000)</span>
-            </h3>
-            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">
-              Imbalance: 67.1% UPF
-            </span>
-          </div>
-          <p class="text-xs text-slate-400">
-            NOVA 4 overwhelmingly dominates commercial food production, while NOVA 2 represents only 0.75% of items.
+        <!-- NOVA Distribution Chart -->
+        <div class="card-clean p-6 space-y-3">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-brand-600"></i>
+            <span>Open Food Facts NOVA Processing Distribution (N=50,000)</span>
+          </h3>
+          <p class="text-xs text-slate-500">
+            NOVA 4 overwhelmingly dominates commercial foods (67.1%), while culinary ingredients (NOVA 2) account for only 0.75%.
           </p>
           <div class="h-64 flex items-center justify-center">
-            <canvas id="nova-dist-chart"></canvas>
+            <canvas id="chart-nova-dist"></canvas>
           </div>
         </div>
 
-        <!-- Chart 2: Marketing Claim Composition within NOVA Groups -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <i data-lucide="bar-chart-horizontal" class="w-4 h-4 text-rose-400"></i>
-              <span>Health Claims Distribution: Commercial Health-Washing</span>
-            </h3>
-            <span class="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300">
-              Objective B Evidence
-            </span>
-          </div>
-          <p class="text-xs text-slate-400">
-            Over half of all food packaging displaying 'Organic', 'Natural', or 'Gluten-Free' belongs to NOVA 4.
+        <!-- Claims vs NOVA Chart -->
+        <div class="card-clean p-6 space-y-3">
+          <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="bar-chart-horizontal" class="w-4 h-4 text-rose-600"></i>
+            <span>Health Claims Composition: Objective B Findings</span>
+          </h3>
+          <p class="text-xs text-slate-500">
+            Over half of all commercial items bearing wellness claims ('Organic', 'Natural') are Ultra-Processed (NOVA 4).
           </p>
           <div class="h-64 flex items-center justify-center">
-            <canvas id="claims-nova-chart"></canvas>
+            <canvas id="chart-claims-nova"></canvas>
           </div>
         </div>
 
       </div>
 
-      <!-- Benchmarking Comparison Table -->
-      <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-              <i data-lucide="award" class="w-4 h-4 text-amber-400"></i>
-              <span>Multi-Model Algorithmic Benchmark (Stage 4 & 5)</span>
-            </h3>
-            <p class="text-xs text-slate-400">
-              Comparing inductive biases on sparse TF-IDF text features and resolving the Accuracy Paradox.
-            </p>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto rounded-xl border border-slate-800">
-          <table class="w-full text-left text-xs">
-            <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-mono">
-              <tr>
-                <th class="py-3 px-4">Algorithm / Paradigm</th>
-                <th class="py-3 px-4">Overall Accuracy</th>
-                <th class="py-3 px-4">Balanced Accuracy</th>
-                <th class="py-3 px-4">Macro F1</th>
-                <th class="py-3 px-4">Inductive Strengths & Trade-offs</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800 text-slate-300">
-              <tr class="hover:bg-slate-800/40">
-                <td class="py-3 px-4 font-bold text-white flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                  <span>Multinomial Naive Bayes</span>
-                </td>
-                <td class="py-3 px-4 font-mono font-bold text-slate-200">84.28%</td>
-                <td class="py-3 px-4 font-mono text-slate-400">54.30%</td>
-                <td class="py-3 px-4 font-mono text-slate-400">0.53</td>
-                <td class="py-3 px-4 text-[11px] text-slate-400">Fast probabilistic inference, but conditionally independent word assumption degrades on n-grams.</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40">
-                <td class="py-3 px-4 font-bold text-white flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                  <span>Random Forest (50 Trees)</span>
-                </td>
-                <td class="py-3 px-4 font-mono font-bold text-slate-200">92.75%</td>
-                <td class="py-3 px-4 font-mono text-slate-400">66.82%</td>
-                <td class="py-3 px-4 font-mono text-slate-400">0.69</td>
-                <td class="py-3 px-4 text-[11px] text-slate-400">Captures non-linear decision thresholds; higher memory footprint and minority starvation.</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40 bg-emerald-950/20">
-                <td class="py-3 px-4 font-bold text-emerald-300 flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span>Default Logistic Regression</span>
-                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Top Accuracy</span>
-                </td>
-                <td class="py-3 px-4 font-mono font-bold text-emerald-400">95.19%</td>
-                <td class="py-3 px-4 font-mono text-slate-300">71.75%</td>
-                <td class="py-3 px-4 font-mono text-slate-300">0.72</td>
-                <td class="py-3 px-4 text-[11px] text-slate-300">Highest overall accuracy and linear XAI transparency, but suffers from low NOVA 2 recall (4.0%).</td>
-              </tr>
-              <tr class="hover:bg-slate-800/40 bg-cyan-950/20">
-                <td class="py-3 px-4 font-bold text-cyan-300 flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-                  <span>Balanced Logistic Regression</span>
-                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">Cost-Sensitive</span>
-                </td>
-                <td class="py-3 px-4 font-mono font-bold text-cyan-400">91.80%</td>
-                <td class="py-3 px-4 font-mono font-bold text-cyan-300">81.85% (+10.1%)</td>
-                <td class="py-3 px-4 font-mono font-bold text-cyan-300">0.79</td>
-                <td class="py-3 px-4 text-[11px] text-cyan-200">Trades ~3.4% overall accuracy to drastically recover NOVA 2 recall from 4.0% to 58.7%.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Top Predictors (XAI) Coefficients Row -->
+      <!-- Top Predictors Row -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- NOVA 1 Whole Food Predictors -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-              <span>Top 15 Predictors for NOVA 1 (Whole & Minimally Processed)</span>
-            </h3>
-            <span class="text-xs text-emerald-400 font-mono">+ Log-Odds</span>
-          </div>
+        <div class="card-clean p-6 space-y-3">
+          <h3 class="text-sm font-bold text-emerald-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            <span>Top 15 Predictor Ingredients for NOVA 1 (Whole Foods)</span>
+          </h3>
           <div class="h-64 flex items-center justify-center">
-            <canvas id="xai-nova1-chart"></canvas>
+            <canvas id="chart-xai-nova1"></canvas>
           </div>
         </div>
 
-        <!-- NOVA 4 UPF Predictors -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-              <span>Top 15 Predictors for NOVA 4 (Ultra-Processed UPFs)</span>
-            </h3>
-            <span class="text-xs text-rose-400 font-mono">+ Log-Odds</span>
-          </div>
+        <div class="card-clean p-6 space-y-3">
+          <h3 class="text-sm font-bold text-rose-800 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+            <span>Top 15 Predictor Ingredients for NOVA 4 (Ultra-Processed UPFs)</span>
+          </h3>
           <div class="h-64 flex items-center justify-center">
-            <canvas id="xai-nova4-chart"></canvas>
+            <canvas id="chart-xai-nova4"></canvas>
           </div>
         </div>
 
@@ -601,209 +773,90 @@
 
     </section>
 
-    <!-- ========================================== -->
-    <!-- TAB 3: BATCH SCANNER & CSV AUDITOR         -->
-    <!-- ========================================== -->
+    <!-- ======================================================== -->
+    <!-- SECTION 4: BATCH SCANNER & CSV AUDITOR                   -->
+    <!-- ======================================================== -->
     <section id="tab-batch" class="space-y-6 hidden">
       
-      <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800/60 to-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="card-clean p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 class="text-2xl font-bold text-white tracking-tight">
+          <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
             Batch Product Scanner & Portfolio Auditor
           </h2>
-          <p class="text-sm text-slate-400 mt-1 max-w-3xl">
-            Audit dozens or hundreds of food formulations simultaneously. Detect portfolio-wide ultra-processing prevalence and flag deceptive packaging marketing claims in bulk.
+          <p class="text-sm text-slate-600 mt-1 max-w-2xl">
+            Upload a CSV containing food products to audit multiple formulations at once, detect portfolio-wide UPF prevalence, and uncover deceptive claims.
           </p>
         </div>
 
-        <button onclick="downloadSampleCSV()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center space-x-1.5 self-start md:self-auto">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+        <button onclick="downloadSampleCSV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-800 border border-slate-300 hover:bg-slate-50 transition-all flex items-center space-x-1.5 shadow-xs">
+          <i data-lucide="download" class="w-4 h-4"></i>
           <span>Download Sample CSV</span>
         </button>
       </div>
 
-      <!-- Upload Zone Card -->
-      <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4">
+      <!-- Dropzone -->
+      <div class="card-clean p-6">
         <div
           id="dropzone"
           ondragover="handleDragOver(event)"
           ondragleave="handleDragLeave(event)"
           ondrop="handleFileDrop(event)"
-          class="border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-xl p-8 text-center transition-all cursor-pointer bg-slate-900/40"
           onclick="document.getElementById('csv-file-input').click()"
+          class="border-2 border-dashed border-slate-300 hover:border-brand-600 rounded-2xl p-8 text-center cursor-pointer bg-slate-50/60 hover:bg-brand-50/30 transition-all"
         >
           <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="handleFileSelect(event)">
-          <div class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mx-auto mb-3 text-slate-400">
-            <i data-lucide="upload-cloud" class="w-6 h-6 text-emerald-400"></i>
+          <div class="w-12 h-12 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="upload-cloud" class="w-6 h-6"></i>
           </div>
-          <span class="text-sm font-semibold text-slate-200 block">Click to select CSV file or drag and drop</span>
+          <span class="text-sm font-bold text-slate-800 block">Click or drag CSV file to audit</span>
           <span class="text-xs text-slate-500 block mt-1">Expected columns: 'product_name', 'ingredients_text'</span>
         </div>
 
-        <div id="file-status" class="hidden text-xs text-emerald-400 font-mono flex items-center gap-1.5">
-          <i data-lucide="check" class="w-3.5 h-3.5"></i>
+        <div id="file-status" class="hidden text-xs text-brand-700 font-semibold mt-3 flex items-center gap-1.5">
+          <i data-lucide="check" class="w-4 h-4"></i>
           <span id="file-name-tag"></span>
         </div>
       </div>
 
       <!-- Batch Results Container -->
       <div id="batch-results-container" class="space-y-4 hidden">
-        
-        <!-- Metrics Summary Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="glass-card p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">Total Audited</span>
-            <span id="batch-stat-total" class="text-2xl font-black font-mono text-white mt-1 block">0</span>
+          <div class="card-clean p-4">
+            <span class="text-xs text-slate-500 block">Total Audited</span>
+            <span id="batch-stat-total" class="text-2xl font-black font-mono text-slate-900 mt-1 block">0</span>
           </div>
-          <div class="glass-card p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">NOVA 4 (UPF) Share</span>
-            <span id="batch-stat-upf" class="text-2xl font-black font-mono text-rose-400 mt-1 block">0%</span>
+          <div class="card-clean p-4">
+            <span class="text-xs text-slate-500 block">NOVA 4 Share</span>
+            <span id="batch-stat-upf" class="text-2xl font-black font-mono text-rose-600 mt-1 block">0%</span>
           </div>
-          <div class="glass-card p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">Health Claims Found</span>
-            <span id="batch-stat-claims" class="text-2xl font-black font-mono text-amber-400 mt-1 block">0</span>
+          <div class="card-clean p-4">
+            <span class="text-xs text-slate-500 block">Claims Found</span>
+            <span id="batch-stat-claims" class="text-2xl font-black font-mono text-amber-600 mt-1 block">0</span>
           </div>
-          <div class="glass-card p-4 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400 block">Health-Washing Rate</span>
-            <span id="batch-stat-rate" class="text-2xl font-black font-mono text-rose-400 mt-1 block">0%</span>
+          <div class="card-clean p-4">
+            <span class="text-xs text-slate-500 block">Health-Washing Rate</span>
+            <span id="batch-stat-rate" class="text-2xl font-black font-mono text-rose-600 mt-1 block">0%</span>
           </div>
         </div>
 
-        <!-- Filter & Search Bar -->
-        <div class="glass-card p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div class="flex items-center space-x-2 w-full sm:w-auto">
-            <input
-              type="text"
-              id="batch-search-input"
-              oninput="filterBatchResults()"
-              placeholder="Search product name or ingredient..."
-              class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 w-full sm:w-64"
-            />
-            <select
-              id="batch-filter-nova"
-              onchange="filterBatchResults()"
-              class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="all">All NOVA Tiers</option>
-              <option value="1">NOVA 1 (Unprocessed)</option>
-              <option value="2">NOVA 2 (Culinary)</option>
-              <option value="3">NOVA 3 (Processed)</option>
-              <option value="4">NOVA 4 (UPF)</option>
-            </select>
-          </div>
-
-          <button onclick="exportBatchCSV()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center space-x-1">
-            <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
-            <span>Export Audited CSV</span>
-          </button>
-        </div>
-
-        <!-- Table -->
-        <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden">
+        <div class="card-clean rounded-2xl overflow-hidden border border-slate-200">
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-mono">
+              <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] tracking-wider border-b border-slate-200 font-mono">
                 <tr>
                   <th class="py-3 px-4">Product Name</th>
-                  <th class="py-3 px-4">Predicted NOVA</th>
+                  <th class="py-3 px-4">NOVA Tier</th>
                   <th class="py-3 px-4">Confidence</th>
-                  <th class="py-3 px-4">Packaging Claims</th>
+                  <th class="py-3 px-4">Detected Claims</th>
                   <th class="py-3 px-4">Health-Washing Status</th>
                 </tr>
               </thead>
-              <tbody id="batch-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <tbody id="batch-table-body" class="divide-y divide-slate-100 text-slate-700">
                 <!-- Dynamically populated -->
               </tbody>
             </table>
           </div>
         </div>
-
-      </div>
-
-    </section>
-
-    <!-- ========================================== -->
-    <!-- TAB 4: METHODOLOGY & SCIENTIFIC CITATIONS  -->
-    <!-- ========================================== -->
-    <section id="tab-methodology" class="space-y-6 hidden">
-      
-      <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800/60 to-slate-900 border border-slate-800">
-        <h2 class="text-2xl font-bold text-white tracking-tight">
-          Scientific Methodology, Mathematical Formulation & Ethical Framework
-        </h2>
-        <p class="text-sm text-slate-400 mt-1 max-w-4xl">
-          Theoretical architecture behind the LabelTruth project, the international NOVA classification system, and statistical inference on corporate health-washing.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- NOVA Framework -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
-            <i data-lucide="book-marked" class="w-4 h-4"></i>
-            <span>1. The NOVA Food Classification Framework</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Proposed in 2009 by Prof. Carlos Monteiro and the Center for Epidemiological Studies in Health and Nutrition at the University of São Paulo, NOVA classifies foods according to the extent and purpose of industrial processing rather than in terms of nutrients alone.
-          </p>
-          <ul class="text-xs text-slate-400 space-y-1.5 list-disc pl-4">
-            <li><strong>NOVA 1 (Unprocessed / Minimally Processed):</strong> Biological parts of plants or animals subjected to physical cleaning, freezing, or drying without chemical modifications.</li>
-            <li><strong>NOVA 2 (Culinary Ingredients):</strong> Pure extracts (oils, sugars, salts, starches) used to prepare culinary dishes.</li>
-            <li><strong>NOVA 3 (Processed Foods):</strong> Whole foods combined with culinary ingredients (salt, oil, sugar) to prolong preservation.</li>
-            <li><strong>NOVA 4 (Ultra-Processed Foods):</strong> Formulations made primarily of industrial substances (emulsifiers, colorants, hydrogenated oils, high-fructose corn syrup).</li>
-          </ul>
-        </div>
-
-        <!-- NLP & XAI -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center space-x-2 text-cyan-400 font-bold text-sm">
-            <i data-lucide="binary" class="w-4 h-4"></i>
-            <span>2. Mathematical Modeling & Explainable AI</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Natural language ingredient listings are tokenized and mapped into a sparse 2,000-dimensional vector space using Term Frequency-Inverse Document Frequency (TF-IDF) with unigram and bigram n-grams:
-          </p>
-          <div class="p-3 rounded-lg bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300">
-            $\text{TF-IDF}(t, d) = \text{TF}(t, d) \times \log\left(\frac{1 + n}{1 + \text{DF}(t)}\right) + 1$
-          </div>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Multinomial Logistic Regression models class log-odds linearly:
-            $\log\left(\frac{P(Y=k)}{P(Y=K)}\right) = \beta_{0, k} + \sum_{j=1}^p \beta_{j, k} x_j$.
-            Because the transformation is strictly linear, the exact feature weight $\beta_{j, k}$ provides uncompromised mathematical attribution.
-          </p>
-        </div>
-
-        <!-- The Accuracy Paradox -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center space-x-2 text-amber-400 font-bold text-sm">
-            <i data-lucide="scale" class="w-4 h-4"></i>
-            <span>3. Addressing The Accuracy Paradox & Class Imbalance</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Because NOVA 4 represents 67.09% and NOVA 2 represents only 0.75% of products in Open Food Facts, standard loss functions starve minority gradients, producing an deceptive 95.19% overall accuracy while recall for NOVA 2 drops to 4.0%.
-          </p>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            We resolve this by implementing cost-sensitive inverse-frequency sample weighting:
-            $w_j = \frac{N}{K \cdot N_j}$.
-            This boosts Balanced Accuracy to 81.85% and recovers NOVA 2 recall to 58.7%.
-          </p>
-        </div>
-
-        <!-- Objective B: Inferential Statistics -->
-        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div class="flex items-center space-x-2 text-rose-400 font-bold text-sm">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i>
-            <span>4. Objective B: The Health-Washing Hypothesis</span>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            We formalize the marketing claim vs. processing test via Pearson's Chi-Square Test of Independence ($\chi^2 = 409.96$, $p < 10^{-80}$). While statistically dependent, the effect size measured via Cramér's $V$ is only <strong>0.0905</strong>.
-          </p>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            This indicates that in practice, front-of-package marketing claims (e.g. 'Natural', 'High Protein') are completely decoupled from genuine minimal processing, as 53.67% of products carrying claims are ultra-processed industrial formulations.
-          </p>
-        </div>
-
       </div>
 
     </section>
@@ -811,28 +864,26 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="border-t border-slate-800 bg-slate-900/60 py-6 mt-12 text-center text-xs text-slate-500">
+  <footer class="bg-white border-t border-slate-200 py-6 mt-16 text-xs text-slate-500 text-center">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-2">
-        <span class="font-bold text-slate-300">LabelTruth</span>
-        <span>• End-to-End Machine Learning & Public Health Data Science</span>
+        <span class="font-bold text-slate-800">LabelTruth</span>
+        <span>• Public Health Data Science & Food Classification</span>
       </div>
       <div class="flex items-center space-x-4">
         <span>Dataset: Open Food Facts</span>
         <span>•</span>
-        <span>Framework: Monteiro et al. NOVA</span>
+        <span>NOVA System (Monteiro et al.)</span>
         <span>•</span>
-        <a href="/docs" target="_blank" class="text-emerald-400 hover:underline">FastAPI Docs</a>
+        <a href="/docs" target="_blank" class="text-brand-700 font-semibold hover:underline">FastAPI Docs</a>
       </div>
     </div>
   </footer>
 
-  <!-- Main JavaScript Application Logic -->
+  <!-- Main JavaScript App -->
   <script src="/static/app.js"></script>
   <script>
-    // Initialize Lucide icons
     lucide.createIcons();
   </script>
 </body>
 </html>
-
