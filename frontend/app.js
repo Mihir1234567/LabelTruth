@@ -54,18 +54,78 @@ const THEME = {
   }
 };
 
-// Preset card category tab colors (Inspired by Image 3)
-const CATEGORY_COLORS = {
-  'Fruits & Beverages': { tab: 'bg-emerald-600 text-white', icon: 'apple' },
-  'Teas': { tab: 'bg-teal-600 text-white', icon: 'coffee' },
-  'Culinary Sweeteners': { tab: 'bg-amber-600 text-white', icon: 'droplet' },
-  'Culinary Oils': { tab: 'bg-amber-500 text-white', icon: 'flame' },
-  'Cheeses': { tab: 'bg-yellow-600 text-white', icon: 'disc' },
-  'Charcuterie': { tab: 'bg-orange-600 text-white', icon: 'utensils' },
-  'Soft Drinks': { tab: 'bg-rose-600 text-white', icon: 'cup-soda' },
-  'Snacks': { tab: 'bg-rose-500 text-white', icon: 'cookie' },
-  'Bars': { tab: 'bg-purple-600 text-white', icon: 'zap' },
-  'Breakfast Cereals': { tab: 'bg-indigo-600 text-white', icon: 'box' }
+// Preset card category styling with authentic folder tabs (Inspired by Reference Image 3)
+const CATEGORY_CONFIG = {
+  'Fruits & Beverages': {
+    icon: '🍎',
+    label: 'Fruits',
+    tabBg: 'bg-emerald-600',
+    border: 'border-emerald-300 hover:border-emerald-500',
+    textMain: 'group-hover:text-emerald-700'
+  },
+  'Teas': {
+    icon: '🍵',
+    label: 'Herbal Tea',
+    tabBg: 'bg-teal-600',
+    border: 'border-teal-300 hover:border-teal-500',
+    textMain: 'group-hover:text-teal-700'
+  },
+  'Culinary Sweeteners': {
+    icon: '🍯',
+    label: 'Sweetener',
+    tabBg: 'bg-sky-600',
+    border: 'border-sky-300 hover:border-sky-500',
+    textMain: 'group-hover:text-sky-700'
+  },
+  'Culinary Oils': {
+    icon: '🫒',
+    label: 'Culinary Oil',
+    tabBg: 'bg-blue-600',
+    border: 'border-blue-300 hover:border-blue-500',
+    textMain: 'group-hover:text-blue-700'
+  },
+  'Cheeses': {
+    icon: '🧀',
+    label: 'Cheese',
+    tabBg: 'bg-amber-600',
+    border: 'border-amber-300 hover:border-amber-500',
+    textMain: 'group-hover:text-amber-700'
+  },
+  'Charcuterie': {
+    icon: '🥓',
+    label: 'Charcuterie',
+    tabBg: 'bg-orange-600',
+    border: 'border-orange-300 hover:border-orange-500',
+    textMain: 'group-hover:text-orange-700'
+  },
+  'Soft Drinks': {
+    icon: '🥤',
+    label: 'Soft Drink',
+    tabBg: 'bg-rose-600',
+    border: 'border-rose-300 hover:border-rose-500',
+    textMain: 'group-hover:text-rose-700'
+  },
+  'Snacks': {
+    icon: '🥨',
+    label: 'Snacks',
+    tabBg: 'bg-pink-600',
+    border: 'border-pink-300 hover:border-pink-500',
+    textMain: 'group-hover:text-pink-700'
+  },
+  'Bars': {
+    icon: '🍫',
+    label: 'Energy Bar',
+    tabBg: 'bg-purple-600',
+    border: 'border-purple-300 hover:border-purple-500',
+    textMain: 'group-hover:text-purple-700'
+  },
+  'Breakfast Cereals': {
+    icon: '🥣',
+    label: 'Cereal',
+    tabBg: 'bg-indigo-600',
+    border: 'border-indigo-300 hover:border-indigo-500',
+    textMain: 'group-hover:text-indigo-700'
+  }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -88,17 +148,19 @@ function setupCharCounter() {
 // Navigation Tabs
 function switchTab(tabId) {
   currentTab = tabId;
-  const tabs = ['inspector', 'traffic', 'insights', 'batch'];
+  const tabs = ['inspector', 'insights', 'batch'];
 
   tabs.forEach(t => {
     const el = document.getElementById(`tab-${t}`);
     const navBtn = document.getElementById(`nav-${t}`);
-    if (t === tabId) {
-      el.classList.remove('hidden');
-      navBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 bg-white text-brand-800 shadow-sm border border-slate-200/80';
-    } else {
-      el.classList.add('hidden');
-      navBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center space-x-2';
+    if (el && navBtn) {
+      if (t === tabId) {
+        el.classList.remove('hidden');
+        navBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 bg-white text-brand-800 shadow-sm border border-slate-200/80';
+      } else {
+        el.classList.add('hidden');
+        navBtn.className = 'px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all flex items-center space-x-2';
+      }
     }
   });
 
@@ -126,7 +188,7 @@ function setModelMode(mode) {
   runAnalysis();
 }
 
-// Fetch and Render Folder-Tab Presets (Inspired by Reference Image 3)
+// Fetch and Render Curated Presets
 async function fetchSampleProducts() {
   const container = document.getElementById('presets-container');
   try {
@@ -137,26 +199,41 @@ async function fetchSampleProducts() {
     if (container && sampleProducts.length > 0) {
       container.innerHTML = '';
       sampleProducts.slice(0, 10).forEach(sample => {
-        const catConfig = CATEGORY_COLORS[sample.category] || { tab: 'bg-slate-700 text-white', icon: 'bookmark' };
+        const catConfig = CATEGORY_CONFIG[sample.category] || {
+          icon: '🏷️',
+          label: 'General',
+          tabBg: 'bg-slate-700',
+          border: 'border-slate-300 hover:border-slate-500',
+          textMain: 'group-hover:text-slate-900'
+        };
         const novaConfig = THEME[sample.expected_nova];
 
         const card = document.createElement('div');
-        card.className = 'folder-card card-clean card-clean-hover p-4 pt-5 cursor-pointer bg-white relative';
+        card.className = 'group relative pt-5 cursor-pointer transition-all duration-200';
         card.onclick = () => loadSample(sample.id);
 
         card.innerHTML = `
-          <div class="folder-tab ${catConfig.tab}">
-            ${sample.category.split(' ')[0]}
+          <!-- Protruding Folder Tab (Reference Image 3) -->
+          <div class="absolute top-0 left-0 h-6 px-2.5 rounded-t-lg text-[10px] font-extrabold uppercase tracking-wide text-white flex items-center gap-1 shadow-xs transition-transform group-hover:-translate-y-0.5 ${catConfig.tabBg}">
+            <span>${catConfig.icon}</span>
+            <span>${catConfig.label}</span>
           </div>
-          <div class="space-y-1.5">
-            <h4 class="text-xs font-bold text-slate-800 line-clamp-1 leading-snug">
-              ${sample.product_name}
-            </h4>
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded ${novaConfig.bgLight} ${novaConfig.textMain} border ${novaConfig.borderLight}">
+
+          <!-- Card Body -->
+          <div class="bg-white border-2 ${catConfig.border} rounded-b-xl rounded-tr-xl p-3 flex flex-col justify-between h-[106px] group-hover:shadow-md transition-all shadow-xs">
+            <div>
+              <h4 class="text-xs font-bold text-slate-800 line-clamp-2 leading-tight ${catConfig.textMain} transition-colors">
+                ${sample.product_name}
+              </h4>
+            </div>
+            <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 mt-1">
+              <span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded ${novaConfig.bgLight} ${novaConfig.textMain} border ${novaConfig.borderLight}">
                 NOVA ${sample.expected_nova}
               </span>
-              <span class="text-[10px] text-slate-400 font-medium">Click to test</span>
+              <span class="text-[10px] font-bold text-slate-400 group-hover:text-slate-800 transition-colors flex items-center gap-0.5">
+                <span>Test</span>
+                <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </span>
             </div>
           </div>
         `;
@@ -264,38 +341,47 @@ function renderAnalysisResult(data) {
     banner.classList.add('hidden');
   }
 
-  // 2. Traffic Light Badges (Inspired by Image 1)
-  const boxNova = document.getElementById('traffic-box-nova');
-  boxNova.className = `p-4 rounded-2xl text-center text-white space-y-1 shadow-sm transition-all ${cfg.pillClass}`;
-  document.getElementById('traffic-val-nova').textContent = cfg.short;
-  document.getElementById('traffic-sub-nova').textContent = nova === 1 ? 'Unprocessed' : (nova === 2 ? 'Culinary' : (nova === 3 ? 'Processed' : 'Ultra-Processed'));
+  // 2. Classification Status Badges
+  const boxNova = document.getElementById('status-box-nova');
+  if (boxNova) {
+    boxNova.className = `p-4 rounded-2xl text-center space-y-1 shadow-xs transition-all ${cfg.bgLight} border ${cfg.borderLight} ${cfg.textMain}`;
+    document.getElementById('status-val-nova').textContent = cfg.short;
+    document.getElementById('status-sub-nova').textContent = nova === 1 ? 'Unprocessed' : (nova === 2 ? 'Culinary' : (nova === 3 ? 'Processed' : 'Ultra-Processed'));
+  }
 
   // Confidence Box
-  document.getElementById('traffic-val-conf').textContent = `${data.prediction.confidence}%`;
+  const valConf = document.getElementById('status-val-conf');
+  if (valConf) valConf.textContent = `${data.prediction.confidence}%`;
   
   // Health-Washing Risk Box
-  const boxRisk = document.getElementById('traffic-box-risk');
-  const valRisk = document.getElementById('traffic-val-risk');
-  const subRisk = document.getElementById('traffic-sub-risk');
-  if (audit.is_health_washed) {
-    boxRisk.className = 'p-4 rounded-2xl text-center text-white space-y-1 shadow-sm transition-all traffic-pill-high';
-    valRisk.textContent = audit.severity.toUpperCase();
-    subRisk.textContent = 'Deceptive Claim';
-  } else if (audit.has_health_claim) {
-    boxRisk.className = 'p-4 rounded-2xl text-center text-white space-y-1 shadow-sm transition-all traffic-pill-low';
-    valRisk.textContent = 'LOW';
-    subRisk.textContent = 'Claim Aligned';
-  } else {
-    boxRisk.className = 'p-4 rounded-2xl text-center bg-white border border-slate-200 text-slate-800 space-y-1 shadow-sm';
-    valRisk.textContent = 'NONE';
-    valRisk.className = 'text-2xl font-black text-slate-900 block font-mono';
-    subRisk.textContent = 'No Claims';
-    subRisk.className = 'text-[11px] text-slate-400 font-medium block';
+  const boxRisk = document.getElementById('status-box-risk');
+  const valRisk = document.getElementById('status-val-risk');
+  const subRisk = document.getElementById('status-sub-risk');
+  if (boxRisk && valRisk && subRisk) {
+    if (audit.is_health_washed) {
+      boxRisk.className = 'p-4 rounded-2xl text-center bg-rose-50 border border-rose-200 text-rose-800 space-y-1 shadow-xs transition-all';
+      valRisk.textContent = audit.severity.toUpperCase();
+      subRisk.textContent = 'Deceptive Claim';
+    } else if (audit.has_health_claim) {
+      boxRisk.className = 'p-4 rounded-2xl text-center bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-1 shadow-xs transition-all';
+      valRisk.textContent = 'LOW';
+      subRisk.textContent = 'Claim Aligned';
+    } else {
+      boxRisk.className = 'p-4 rounded-2xl text-center bg-white border border-slate-200 text-slate-800 space-y-1 shadow-xs';
+      valRisk.textContent = 'NONE';
+      valRisk.className = 'text-2xl font-black text-slate-900 block font-mono';
+      subRisk.textContent = 'No Claims';
+      subRisk.className = 'text-[11px] text-slate-400 font-medium block';
+    }
   }
 
   // Claims Count Box
-  document.getElementById('traffic-val-claims').textContent = audit.detected_claims.length;
-  document.getElementById('traffic-sub-claims').textContent = audit.detected_claims.length > 0 ? audit.detected_claims.slice(0, 2).join(', ') : 'None Found';
+  const valClaims = document.getElementById('status-val-claims');
+  const subClaims = document.getElementById('status-sub-claims');
+  if (valClaims && subClaims) {
+    valClaims.textContent = audit.detected_claims.length;
+    subClaims.textContent = audit.detected_claims.length > 0 ? audit.detected_claims.slice(0, 2).join(', ') : 'None Found';
+  }
 
   // 3. LabelTruth Facts Box (Inspired by Image 2 Nutrition Facts)
   document.getElementById('label-product-name').textContent = data.product_name;
@@ -332,62 +418,11 @@ function renderAnalysisResult(data) {
     if (p) p.textContent = `${probs[`NOVA_${i}`] || 0}%`;
   }
 
-  // 4. Render Explainable AI (XAI) Attribution
-  renderXAI(data.explainable_ai, nova);
-
   lucide.createIcons();
 }
 
-// Render Explainable AI
-function renderXAI(xai, nova) {
-  const container = document.getElementById('xai-pills-container');
-  const tbody = document.getElementById('xai-table-body');
-  container.innerHTML = '';
-  tbody.innerHTML = '';
-
-  const contributors = xai.top_contributors || [];
-
-  if (contributors.length === 0) {
-    container.innerHTML = '<span class="text-xs text-slate-400">No strong vocabulary tokens found.</span>';
-    tbody.innerHTML = '<tr><td colspan="4" class="py-3 px-4 text-center text-slate-400">No token contributions calculated.</td></tr>';
-    return;
-  }
-
-  contributors.forEach(item => {
-    const isPositive = item.contribution > 0;
-    
-    // Pill tag
-    const pill = document.createElement('span');
-    const pillClass = isPositive
-      ? (nova === 4 ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300')
-      : 'bg-slate-100 text-slate-600 border-slate-200';
-
-    pill.className = `text-xs px-2.5 py-1 rounded-lg border font-mono font-medium flex items-center space-x-1.5 ${pillClass}`;
-    pill.innerHTML = `
-      <span>${item.token}</span>
-      <span class="text-[10px] font-bold ${isPositive ? 'opacity-100' : 'opacity-60'}">
-        ${isPositive ? '+' : ''}${item.contribution}
-      </span>
-    `;
-    container.appendChild(pill);
-
-    // Table row
-    const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-50 transition-colors';
-    tr.innerHTML = `
-      <td class="py-2.5 px-3 font-semibold text-slate-800">${item.token}</td>
-      <td class="py-2.5 px-3 text-slate-500">${item.weight > 0 ? '+' : ''}${item.weight}</td>
-      <td class="py-2.5 px-3 text-slate-500">${item.tfidf}</td>
-      <td class="py-2.5 px-3 text-right font-bold ${isPositive ? (nova === 4 ? 'text-rose-600' : 'text-emerald-600') : 'text-slate-500'}">
-        ${isPositive ? '+' : ''}${item.contribution}
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
 // ==========================================
-// RESEARCH & CHARTS (TAB 3)
+// RESEARCH & CHARTS (TAB 2)
 // ==========================================
 async function initCharts() {
   if (chartsInitialized) return;
@@ -442,58 +477,6 @@ async function initCharts() {
           plugins: { legend: { display: false } },
           scales: {
             x: { title: { display: true, text: 'Percentage (%)', font: { size: 11 } } }
-          }
-        }
-      });
-    }
-
-    // 3. Top Predictors NOVA 1
-    const ctx1 = document.getElementById('chart-xai-nova1');
-    const top1 = data.top_predictors.nova_1 || [];
-    if (ctx1 && top1.length > 0) {
-      new Chart(ctx1, {
-        type: 'bar',
-        data: {
-          labels: top1.map(t => t.token),
-          datasets: [{
-            data: top1.map(t => t.weight),
-            backgroundColor: '#10b981',
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          indexAxis: 'y',
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { ticks: { font: { size: 10 } } }
-          }
-        }
-      });
-    }
-
-    // 4. Top Predictors NOVA 4
-    const ctx4 = document.getElementById('chart-xai-nova4');
-    const top4 = data.top_predictors.nova_4 || [];
-    if (ctx4 && top4.length > 0) {
-      new Chart(ctx4, {
-        type: 'bar',
-        data: {
-          labels: top4.map(t => t.token),
-          datasets: [{
-            data: top4.map(t => t.weight),
-            backgroundColor: '#ef4444',
-            borderRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          indexAxis: 'y',
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { ticks: { font: { size: 10 } } }
           }
         }
       });
